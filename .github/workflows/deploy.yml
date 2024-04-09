@@ -51,4 +51,4 @@ jobs:
     - name: Start docker compose
       env:
         SERVER_IP: ${{ secrets.SERVER_IP }}
-      run: ssh -o StrictHostKeyChecking=no root@$SERVER_IP "cd /var/www && docker-compose up -d"
+      run: ssh -o StrictHostKeyChecking=no root@$SERVER_IP "cd /var/www && docker-compose up --build -d"
