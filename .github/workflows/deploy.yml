@@ -40,11 +40,9 @@ jobs:
           EOF
 
     - name: Copy env file
-      env:
-        SERVER_IP: ${{ secrets.SERVER_IP }}
       uses: appleboy/scp-action@v0.1.1
       with:
-        host: $SERVER_IP
+        host: ${{ secrets.SERVER_IP }}
         username: root
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         source: ".env"
