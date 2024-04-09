@@ -28,4 +28,4 @@ def root():
 
 @app.get("/hello/{name}", tags=["Fun"])
 def say_hello(name: str):
-    return {"message": f"Helloo, {name}!"}
+    return {"message": f"Hello, my dear {name}! How are you today?"}
