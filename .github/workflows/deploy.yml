@@ -1,0 +1,56 @@
+name: Deploy to server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup SSH key
+      uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Generate .env file
+      env:
+        APP_KEY: ${{ secrets.APP_KEY }}
+        ACCESS_TOKEN_EXPIRES_IN: ${{ secrets.ACCESS_TOKEN_EXPIRES_IN }}
+        DB_USER: ${{ secrets.DB_USER }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        DB_NAME: ${{ secrets.DB_NAME }}
+        DB_HOST: ${{ secrets.DB_HOST }}
+        DB_PORT: ${{ secrets.DB_PORT }}
+      run: chmod +x ./create_env.sh && ./create_env.sh
+
+    - name: SSH to server and perform operations
+      env:
+        SERVER_IP: ${{ secrets.SERVER_IP }}
+      run: |
+          ssh -o StrictHostKeyChecking=no root@$SERVER_IP << EOF
+          docker-compose down
+          rm -rf /var/www && mkdir /var/www
+          git clone https://github.com/hrsa/py-fastapi.git /var/www
+          EOF
+
+    - name: Copy env file
+      env:
+        SERVER_IP: ${{ secrets.SERVER_IP }}
+      uses: appleboy/scp-action@v0.1.1
+      with:
+        host: $SERVER_IP
+        username: root
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        source: ".env"
+        target: "/var/www"
+
+    - name: Start docker compose
+      env:
+        SERVER_IP: ${{ secrets.SERVER_IP }}
+      run: ssh -o StrictHostKeyChecking=no root@$SERVER_IP "cd /var/www && docker-compose up -d"
