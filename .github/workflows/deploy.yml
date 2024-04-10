@@ -33,8 +33,10 @@ jobs:
       env:
         SERVER_IP: ${{ secrets.SERVER_IP }}
       run: |
-        ssh -o StrictHostKeyChecking=no root@$SERVER_IP
-        "docker-compose down"
+        ssh -o StrictHostKeyChecking=no root@$SERVER_IP << EOF
+        cd /var/www
+        docker-compose down
+        EOF
 
     - name: SSH to server and clone the repository
       env:
