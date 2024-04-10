@@ -27,6 +27,7 @@ jobs:
         DB_NAME: ${{ secrets.DB_NAME }}
         DB_HOST: ${{ secrets.DB_HOST }}
         DB_PORT: ${{ secrets.DB_PORT }}
+        SERVER_URL: ${{ secrets.SERVER_URL }}
       run: chmod +x ./create_env.sh && ./create_env.sh
 
     - name: Stop docker containers
@@ -50,10 +51,10 @@ jobs:
     - name: Modify nginx config
       env:
         SERVER_IP:  ${{ secrets.SERVER_IP }}
-        SERVER_NAME: ${{ secrets.SERVER_NAME }}
+        SERVER_URL: ${{ secrets.SERVER_URL }}
       run: |
           ssh -o StrictHostKeyChecking=no root@$SERVER_IP << EOF
-          sed -i 's/localhost/$SERVER_NAME/g' /var/www/nginx-config.conf
+          sed -i 's/yourdomain.com/$SERVER_URL/g' /var/www/nginx-config.conf
           EOF
 
     - name: Copy .env file to server
