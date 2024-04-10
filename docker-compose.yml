@@ -23,6 +23,9 @@ services:
     build:
       context: .
       dockerfile: certbot.dockerfile
+    depends_on:
+      nginx:
+        condition: service_started
     volumes:
       - certbot-etc:/etc/letsencrypt
       - certbot-var:/var/lib/letsencrypt
