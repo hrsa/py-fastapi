@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     secret_key: str
     algorithm: str
     access_token_expires_in: int
+    server_url: str
 
     class Config:
         env_file = ".env"
