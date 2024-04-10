@@ -27,8 +27,10 @@ services:
       nginx:
         condition: service_started
     volumes:
+      - ./certbot-entrypoint.sh:/entrypoint.sh
       - certbot-etc:/etc/letsencrypt
       - certbot-var:/var/lib/letsencrypt
+    entrypoint: ["/bin/bash", "/entrypoint.sh"]
     environment:
       - DOMAIN=${SERVER_URL}
       - EMAIL=anton@anton.eco
