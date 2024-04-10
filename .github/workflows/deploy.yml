@@ -29,12 +29,18 @@ jobs:
         DB_PORT: ${{ secrets.DB_PORT }}
       run: chmod +x ./create_env.sh && ./create_env.sh
 
+    - name: Stop docker containers
+      env:
+        SERVER_IP: ${{ secrets.SERVER_IP }}
+      run: |
+        ssh -o StrictHostKeyChecking=no root@$SERVER_IP
+        "docker-compose down"
+
     - name: SSH to server and clone the repository
       env:
         SERVER_IP: ${{ secrets.SERVER_IP }}
       run: |
           ssh -o StrictHostKeyChecking=no root@$SERVER_IP << EOF
-          docker-compose down
           rm -rf /var/www && mkdir /var/www
           git clone https://github.com/hrsa/py-fastapi.git /var/www
           EOF
