@@ -29,7 +29,7 @@ jobs:
         DB_PORT: ${{ secrets.DB_PORT }}
       run: chmod +x ./create_env.sh && ./create_env.sh
 
-    - name: SSH to server and perform operations
+    - name: SSH to server and clone the repository
       env:
         SERVER_IP: ${{ secrets.SERVER_IP }}
       run: |
@@ -37,6 +37,16 @@ jobs:
           docker-compose down
           rm -rf /var/www && mkdir /var/www
           git clone https://github.com/hrsa/py-fastapi.git /var/www
+          EOF
+
+    - name: Modify nginx config
+      env:
+        SERVER_NAME: ${{ secrets.SERVER_IP }}
+      run: |
+          ssh -o StrictHostKeyChecking=no root@$SERVER_IP << EOF
+          echo "${SERVER_NAME}" > server_name.txt
+          sed -i 's/localhost/$(cat server_name.txt)/g' /var/www/nginx-config.conf
+          rm server_name.txt
           EOF
 
     - name: Copy env file
