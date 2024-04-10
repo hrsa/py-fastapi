@@ -50,14 +50,11 @@ jobs:
           rm server_name.txt
           EOF
 
-    - name: Copy env file
-      uses: appleboy/scp-action@v0.1.7
-      with:
-        host: ${{ secrets.SERVER_IP }}
-        username: root
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        source: ".env"
-        target: "/var/www"
+    - name: Copy .env file to server
+      env:
+        SERVER_IP: ${{ secrets.SERVER_IP }}
+      run: |
+        scp -o StrictHostKeyChecking=no .env root@$SERVER_IP:/var/www
 
     - name: Start docker compose
       env:
