@@ -53,9 +53,7 @@ jobs:
         SERVER_NAME: ${{ secrets.SERVER_NAME }}
       run: |
           ssh -o StrictHostKeyChecking=no root@$SERVER_IP << EOF
-          echo "${SERVER_NAME}" > server_name.txt
-          sed -i 's/localhost/$(cat server_name.txt)/g' /var/www/nginx-config.conf
-          rm server_name.txt
+          sed -i 's/localhost/$SERVER_NAME/g' /var/www/nginx-config.conf
           EOF
 
     - name: Copy .env file to server
