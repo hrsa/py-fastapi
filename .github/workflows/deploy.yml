@@ -41,6 +41,7 @@ jobs:
 
     - name: Modify nginx config
       env:
+        SERVER_IP:  ${{ secrets.SERVER_IP }}
         SERVER_NAME: ${{ secrets.SERVER_IP }}
       run: |
           ssh -o StrictHostKeyChecking=no root@$SERVER_IP << EOF
