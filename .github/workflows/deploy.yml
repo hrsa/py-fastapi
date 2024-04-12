@@ -37,14 +37,6 @@ jobs:
         pip install -r requirements.txt
         pip install pytest
 
-    - name: Run tests
-      run: pytest
-
-    - name: Setup SSH key
-      uses: webfactory/ssh-agent@v0.9.0
-      with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
     - name: Generate .env file
       env:
         APP_KEY: ${{ secrets.APP_KEY }}
@@ -56,6 +48,14 @@ jobs:
         DB_PORT: ${{ secrets.DB_PORT }}
         SERVER_URL: ${{ secrets.SERVER_URL }}
       run: chmod +x ./create_env.sh && ./create_env.sh
+
+    - name: Run tests
+      run: pytest
+
+    - name: Setup SSH key
+      uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
     - name: Stop docker containers
       env:
