@@ -37,14 +37,6 @@ jobs:
         pip install -r requirements.txt
         pip install pytest
 
-    - name: Install PostgreSQL client
-      run: sudo apt-get -yqq install postgresql-client
-
-    - name: Setup Database
-      run: |
-        export PGPASSWORD=${{ secrets.DB_PASSWORD }}
-        psql -h localhost -U ${{ secrets.DB_USER }} -d postgres -c "CREATE DATABASE ${{ secrets.TEST_DB_NAME }};"
-
     - name: Generate .env file
       env:
         APP_KEY: ${{ secrets.APP_KEY }}
@@ -55,7 +47,7 @@ jobs:
         DB_HOST: ${{ secrets.DB_HOST }}
         DB_PORT: ${{ secrets.DB_PORT }}
         SERVER_URL: ${{ secrets.SERVER_URL }}
-      run: chmod +x ./create_env.sh && ./create_env.sh
+      run: pwd && chmod +x ./create_env.sh && ./create_env.sh
 
     - name: Run tests
       run: pytest
