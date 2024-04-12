@@ -54,6 +54,8 @@ jobs:
       run: chmod +x ./create_env.sh && ./create_env.sh && cat .env
 
     - name: Run tests
+      env:
+        DB_HOST: localhost
       run: pytest
 
     - name: Setup SSH key
