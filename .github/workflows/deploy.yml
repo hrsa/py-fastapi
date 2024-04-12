@@ -19,13 +19,6 @@ jobs:
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-        entrypoint: >
-          /bin/sh -c "
-          /docker-entrypoint.sh postgres &
-          sleep 10 &&
-          echo 'Creating additional database: testing_fast_api' &&
-          echo 'CREATE DATABASE testing_fast_api;' | psql --username=$POSTGRES_USER --dbname=$POSTGRES_DB &&
-          wait %%;"
 
     steps:
     - name: Checkout repository
@@ -43,6 +36,14 @@ jobs:
       run: |
         pip install -r requirements.txt
         pip install pytest
+
+    - name: Install PostgreSQL client
+      run: sudo apt-get -yqq install postgresql-client
+
+    - name: Setup Database
+      run: |
+        export PGPASSWORD=${{ secrets.DB_PASSWORD }}
+        psql -h localhost -U ${{ secrets.DB_USER }} -d postgres -c "CREATE DATABASE ${{ secrets.TEST_DB_NAME }};"
 
     - name: Generate .env file
       env:
