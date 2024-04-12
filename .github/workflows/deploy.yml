@@ -47,6 +47,9 @@ jobs:
         pip install -r requirements.txt
         pip install pytest
 
+    - name: Generate .env file
+      run: chmod +x ./create_env.sh && ./create_env.sh
+
     - name: Run tests
       run: pytest
 
