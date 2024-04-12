@@ -12,6 +12,8 @@ jobs:
     services:
       db:
         image: postgres:12
+        volumes:
+          - ./create_db.sql:/docker-entrypoint-initdb.d/create_db.sql
         env:
           POSTGRES_USER: ${{ secrets.DB_USER }}
           POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
