@@ -16,7 +16,6 @@ jobs:
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
       DB_NAME: ${{ secrets.DB_NAME }}
       TEST_DB_NAME: ${{ secrets.TEST_DB_NAME }}
-      DB_HOST: ${{ secrets.DB_HOST }}
       DB_PORT: ${{ secrets.DB_PORT }}
       SERVER_URL: ${{ secrets.SERVER_URL }}
       SERVER_IP: ${{ secrets.SERVER_IP }}
@@ -52,7 +51,7 @@ jobs:
     - name: Generate testing .env file
       env:
         DB_HOST: localhost
-      run: chmod +x ./create_env.sh && ./create_env.sh
+      run: chmod +x ./create_env.sh && ./create_env.sh && cat .env
 
     - name: Run tests
       run: pytest
@@ -63,6 +62,8 @@ jobs:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
     - name: Generate production .env file
+      env:
+        DB_HOST: ${{ secrets.DB_HOST }}
       run: chmod +x ./create_env.sh && ./create_env.sh
 
     - name: Stop docker containers
