@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
 
     env:
@@ -14,11 +14,10 @@ jobs:
       ACCESS_TOKEN_EXPIRES_IN: ${{ secrets.ACCESS_TOKEN_EXPIRES_IN }}
       DB_USER: ${{ secrets.DB_USER }}
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      DB_HOST: localhost
       DB_NAME: ${{ secrets.DB_NAME }}
       TEST_DB_NAME: ${{ secrets.TEST_DB_NAME }}
       DB_PORT: ${{ secrets.DB_PORT }}
-      SERVER_URL: ${{ secrets.SERVER_URL }}
-      SERVER_IP: ${{ secrets.SERVER_IP }}
 
     services:
       db:
@@ -48,24 +47,35 @@ jobs:
         pip install -r requirements.txt
         pip install pytest
 
-    - name: Generate testing .env file
-      env:
-        DB_HOST: localhost
-      run: chmod +x ./create_env.sh && ./create_env.sh && cat .env
-
     - name: Run tests
-      env:
-        DB_HOST: localhost
       run: pytest
+
+  deploy:
+    needs: [test]
+    runs-on: ubuntu-latest
+
+    env:
+      APP_KEY: ${{ secrets.APP_KEY }}
+      ACCESS_TOKEN_EXPIRES_IN: ${{ secrets.ACCESS_TOKEN_EXPIRES_IN }}
+      DB_USER: ${{ secrets.DB_USER }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      DB_HOST: ${{ secrets.DB_HOST }}
+      DB_NAME: ${{ secrets.DB_NAME }}
+      TEST_DB_NAME: ${{ secrets.TEST_DB_NAME }}
+      DB_PORT: ${{ secrets.DB_PORT }}
+      SERVER_URL: ${{ secrets.SERVER_URL }}
+      SERVER_IP: ${{ secrets.SERVER_IP }}
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
     - name: Setup SSH key
       uses: webfactory/ssh-agent@v0.9.0
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: Generate production .env file
-      env:
-        DB_HOST: ${{ secrets.DB_HOST }}
+    - name: Generate .env file
       run: chmod +x ./create_env.sh && ./create_env.sh
 
     - name: Stop docker containers
@@ -92,5 +102,5 @@ jobs:
       run: |
         scp -o StrictHostKeyChecking=no .env root@$SERVER_IP:/var/www
 
-    - name: Start docker compose
+    - name: Start docker containers
       run: ssh -o StrictHostKeyChecking=no root@$SERVER_IP "cd /var/www && docker-compose up --build -d"
