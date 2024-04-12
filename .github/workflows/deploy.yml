@@ -51,6 +51,16 @@ jobs:
       run: chmod +x ./create_env.sh && ./create_env.sh
 
     - name: Run tests
+      env:
+        APP_KEY: ${{ secrets.APP_KEY }}
+        ACCESS_TOKEN_EXPIRES_IN: ${{ secrets.ACCESS_TOKEN_EXPIRES_IN }}
+        DB_USER: ${{ secrets.DB_USER }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        DB_NAME: ${{ secrets.DB_NAME }}
+        TEST_DB_NAME: ${{ secrets.TEST_DB_NAME }}
+        DB_HOST: ${{ secrets.DB_HOST }}
+        DB_PORT: ${{ secrets.DB_PORT }}
+        SERVER_URL: ${{ secrets.SERVER_URL }}
       run: pytest
 
     - name: Setup SSH key
