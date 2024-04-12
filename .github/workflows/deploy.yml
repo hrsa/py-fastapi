@@ -49,7 +49,9 @@ jobs:
         pip install -r requirements.txt
         pip install pytest
 
-    - name: Generate .env file
+    - name: Generate testing .env file
+      env:
+        DB_HOST: localhost
       run: chmod +x ./create_env.sh && ./create_env.sh
 
     - name: Run tests
@@ -59,6 +61,9 @@ jobs:
       uses: webfactory/ssh-agent@v0.9.0
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Generate production .env file
+      run: chmod +x ./create_env.sh && ./create_env.sh
 
     - name: Stop docker containers
       run: |
