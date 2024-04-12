@@ -19,6 +19,16 @@ def get_posts(db: Session = Depends(get_db), limit: int = 10, skip: int = 0, sea
              .all())
     return posts
 
+@router.get("/my_posts")
+def get_my_posts(db: Session = Depends(get_db),
+                 current_user: schemas.UserResponse = Depends(oauth2.get_current_user)
+                 ):
+    posts = db.query(models.Post).filter(models.Post.author_id == current_user.id).all()
+    if posts is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"You have no posts, {current_user.name}!")
+
+    return posts
+
 
 @router.get("/{post_id}", response_model=schemas.PostResponse)
 def get_post(post_id: int, db: Session = Depends(get_db)):
@@ -60,17 +70,6 @@ def create_post(post: schemas.PostCreate,
     db.commit()
     db.refresh(new_post)
     return new_post
-
-
-@router.get("/my_posts")
-def get_my_posts(db: Session = Depends(get_db),
-                 current_user: schemas.UserResponse = Depends(oauth2.get_current_user)
-                 ):
-    posts = db.query(models.Post).filter(models.Post.author_id == current_user.id).all()
-    if posts is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"You have no posts, {current_user.name}!")
-
-    return posts
 
 
 @router.delete("/{post_id}")

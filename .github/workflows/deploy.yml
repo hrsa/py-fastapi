@@ -1,4 +1,4 @@
-name: Deploy to server
+name: Test and deploy to server
 
 on:
   push:
@@ -12,6 +12,22 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+
+    - name: Setup Python 🐍
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.12.2
+
+    - name: Upgrade pip 🐤
+      run: python -m pip install --upgrade pip
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install pytest
+
+    - name: Run tests
+      run: pytest
 
     - name: Setup SSH key
       uses: webfactory/ssh-agent@v0.9.0

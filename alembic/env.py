@@ -1,3 +1,4 @@
+import os
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
@@ -10,9 +11,14 @@ from app.config import settings
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
-config.set_main_option("sqlalchemy.url",
-                       f"postgresql+psycopg2://{settings.db_user}:{settings.db_password}"
-                       f"@{settings.db_host}:{settings.db_port}/{settings.db_name}")
+
+is_testing = os.getenv("IS_TESTING")
+if is_testing:
+    config.set_main_option("sqlalchemy.url", f"postgresql://{settings.db_user}:{settings.db_password}"
+                                             f"@{settings.db_host}:{settings.db_port}/{settings.test_db_name}")
+else:
+    config.set_main_option("sqlalchemy.url", f"postgresql+psycopg2://{settings.db_user}:{settings.db_password}"
+                                             f"@{settings.db_host}:{settings.db_port}/{settings.db_name}")
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -24,6 +30,7 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 target_metadata = Base.metadata
+
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
